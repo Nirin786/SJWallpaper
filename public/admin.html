@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html class="h-100">
+
+<head>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script
+  src="https://code.jquery.com/jquery-3.6.1.min.js"
+  integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+  crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
+        integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/style.css" />
+
+
+</head>
+
+<body class="h-100">
+
+    <!--nav bar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Wallpaper App admin</a>
+
+             <!--drop down navbar-->
+            <div class="dropdown navbar-right">
+                <button id="user_email" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    sjproject111@gmail.com
+                </button>
+                <div class="dropdown-menu" aria-labelledby="user_email">
+                    <a class="dropdown-item" href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!--side row navbar-->
+    <div class="row h-100 bg-light">
+        <div class="col-lg-2 bg-secondary">
+
+            <!--list items-->
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="text-dark">Images</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <!--go to categorie -->
+                    <a class="nav-link" href="#" onclick="switchView('views/categories.html')">
+                        <span class="text-dark">Catagories</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-10">
+            <div class="container" id="container">
+            
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--firebase auth-->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyBFrJbe8k4VX9tKX5NqWFn0kE0fGFN4szE",
+          authDomain: "js-wallpaper.firebaseapp.com",
+          projectId: "js-wallpaper",
+          storageBucket: "js-wallpaper.appspot.com",
+          messagingSenderId: "436440509154",
+          appId: "1:436440509154:web:4fcc16874410af50a1ccbb",
+          measurementId: "G-BVRMW8RT8Y"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      
+        //auth observer
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            }
+        });
+        </script>
+    </script>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>

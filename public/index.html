@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<!--body background color will be black for body class -->
+
+<body class="bg-dark">
+
+    <!--class card is for cardView -->
+    <div id="login-card" class="card">
+        <div class="card-body">
+            <h1>Admin Panel</h1>
+
+
+            <!--login form with email and password & login btn -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">email</label>
+                    <input type="text" id="email" name="email" class="form-control">
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="password">password</label>
+                        <input type="password" id="password" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <button id="LoginBtn" type="button" class="btn btn-primary">Login</button>
+                    </div>
+
+                </form>
+
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyBFrJbe8k4VX9tKX5NqWFn0kE0fGFN4szE",
+          authDomain: "js-wallpaper.firebaseapp.com",
+          projectId: "js-wallpaper",
+          storageBucket: "js-wallpaper.appspot.com",
+          messagingSenderId: "436440509154",
+          appId: "1:436440509154:web:4fcc16874410af50a1ccbb",
+          measurementId: "G-BVRMW8RT8Y"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      
+
+        //loginbtn -> firebase auth signIn
+        $("#LoginBtn").click(function () {
+            var email = $("#email").val();
+            var pass = $("#password").val();
+
+            signInWithEmailAndPassword(auth, email, pass)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    alert("successfully login ");
+
+                    //opening new page after sucessfully
+                    window.location.href = "admin.html";
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+
+                    alert(errorMessage);
+                });
+
+
+        });
+
+        //auth observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, see docs for a list of available properties
+                // https://firebase.google.com/docs/reference/js/firebase.User
+                const uid = user.uid;
+                window.location.href = "admin.html";
+            }
+        });
+
+
+
+         </script>
+    </script>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>

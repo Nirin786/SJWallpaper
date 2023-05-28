@@ -1,0 +1,231 @@
+<!--categori ui-->
+
+<h2>Categories</h2>
+
+<hr />
+
+<div class="row">
+    <div class="col-lg-5">
+        <h4>Add new</h4>
+        <form>
+
+            <!--categori name -->
+            <div class="form-froup">
+                <label for="category-name">Enter name</label>
+                <input type="text" class="form-control" id="category-name" />
+                <div class="invalid-feedback">Please enter a category name</div>
+            </div>
+
+            <!--categori description-->
+            <div class="form-froup">
+                <label for="category-desc">Description</label>
+                <input type="text" class="form-control" id="category-desc" />
+                <div class="invalid-feedback">Please enter a category name</div>
+            </div>
+
+            <!--category file-->
+            <div class="form-froup">
+                <label for="category-thumbnail">Thumbnail</label>
+                <input type="file" class="form-control" id="category-thumbnail" />
+                <div class="invalid-feedback">Please choose a valid image file</div>
+            </div>
+
+            <div class="form-group">
+                <img id="selected-thumbanail" width="250" height="150" src="#" />
+            </div>
+
+            <!--categori progressbar-->
+            <div class="form-group">
+                <div class="progress">
+                    <div class="progress-bar" id="uploadprogress" style="width:0%">0%</div>
+                </div>
+            </div>
+
+            <!--save btn-->
+            <div class="form-group">
+                <button type="button" id="save-category" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+
+        <div id="result">
+
+        </div>
+    </div>
+
+    <!-- to show save categories -->
+    <div class="col-lg-7">
+        <h4>Saved Categories</h4>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-storage.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBFrJbe8k4VX9tKX5NqWFn0kE0fGFN4szE",
+        authDomain: "js-wallpaper.firebaseapp.com",
+        projectId: "js-wallpaper",
+        storageBucket: "js-wallpaper.appspot.com",
+        messagingSenderId: "436440509154",
+        appId: "1:436440509154:web:4fcc16874410af50a1ccbb",
+        measurementId: "G-BVRMW8RT8Y"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const storage = getStorage();
+
+    const metadata = {
+        contentType: 'image/png'
+    };
+
+    var validImgType = ["image/gif", "image/jpeg", "image/png"];
+
+    $("#selected-thumbanail").hide();
+
+    function previewThumbnail(thumbnail) {
+        if (thumbnail.files && thumbnail.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#selected-thumbanail").attr('src', e.target.result);
+                $("#selected-thumbanail").fadeIn();
+
+            }
+            reader.readAsDataURL(thumbnail.files[0]);
+
+        }
+    }
+
+    $("#category-thumbnail").change(function () {
+        previewThumbnail(this);
+    });
+
+
+    $("#save-category").click(function () {
+
+        $("#category-name").removeClass("is-invalid");
+        $("#category-desc").removeClass("is-invalid");
+        $("#category-thumbnail").removeClass("is-invalid");
+
+
+        var catName = $("#category-name").val();
+        var catDesc = $("#category-desc").val();
+        var thumbanail = $("#category-thumbnail").prop("files")[0];
+
+        if (!catName) {
+            $("#category-name").addClass("is-invalid");
+            return;
+
+        }
+        if (!catDesc) {
+            $("#category-desc").addClass("is-invalid");
+            return;
+
+        } if (thumbanail == null) {
+            $("#category-thumbnail").addClass("is-invalid");
+            return;
+        }
+        if ($.inArray(thumbanail["type"], validImgType) < 0) {
+            $("#category-thumbnail").addClass("is-invalid");
+            return;
+        }
+
+        var storageRef = ref(storage, "categories/" + catName);
+        const uploadTask = uploadBytesResumable(storageRef, thumbanail, metadata);
+
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                    switch (snapshot.state) {
+                        case 'paused':
+                            console.log('Upload is paused');
+                            break;
+                        case 'running':
+                            console.log('Upload is running');
+                            break;
+                    }
+                
+
+            },
+            (error) => {
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+
+                    // ...
+
+                    case 'storage/unknown':
+                        // Unknown error occurred, inspect error.serverResponse
+                        break;
+                }
+            },
+            () => {
+                // Upload completed successfully, now we can get the download URL
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    console.log('File available at', downloadURL);
+                });
+            }
+        );
+
+        // database.once("value").then(function (snapshot) {
+        //     if (snapshot.exists()) {
+        //         $("#result").attr("class", "alert alert-danger");
+        //         $("#result").html("Category already exists");
+        //     } else {
+        //         var name = thumbanail["name"];
+        //         var ext = name.substring(name.lastIndexOf("."), name.length);
+        //         var thumbName = new Date.getTime();
+        //         var storageRef = firebase.storage().ref(catName + "/" + thumbName+ext);
+        //         var uploadTask = storageRef.put(thumbanail);
+        //         uploadTask.on("state_changed",
+
+        //             function progress(snapshot) {
+        //                 var percentage = (snapshot.bytesTransferred / snapshot.totalbytes) * 100;
+        //                 $("upload-progress").html(percentage + "%");
+        //                 $("upload-progress").attr("style", "width: " + percentage + " %");
+
+        //             },
+
+        //             function error(err) {
+
+        //             },
+
+        //             function complete() {
+        //                 var thumbnailUrl = uploadTask.snapshot.downloadURL;
+        //                 var saveCat = {
+        //                     "thumbanail": thumbnailUrl,
+        //                     "desc": catDesc
+        //                 };
+
+        //                 database.set(saveCat, function (err) {
+        //                     if (err) {
+        //                         $("#result").attr("class", "alert alert-danger");
+        //                         $("#result").html(err.message);
+        //                     } else {
+        //                         $("#result").attr("class", "alert alert-success");
+        //                         $("#result").html("Category added");
+        //                     }
+        //                 })
+
+        //             }
+
+
+
+        //         );
+        //     }
+        // });
+
+
+    });
+
+</script>
